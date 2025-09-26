@@ -45,10 +45,12 @@
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
         const error = urlParams.get('error');
+        const frontendBase = window.location.origin;
+        const apiBase = window.__API_BASE__ || frontendBase;
         
         if (error) {
             // Authentication failed
-            window.location.href = 'http://localhost:3000/?auth=error';
+            window.location.href = `${frontendBase}/?auth=error`;
         } else if (code) {
             // Exchange code for token
             const params = new URLSearchParams();
@@ -57,21 +59,21 @@
                 params.append('state', urlParams.get('state'));
             }
             
-            fetch('http://localhost:3001/api/auth/spotify/callback?' + params.toString())
+            fetch(`${apiBase}/api/auth/spotify/callback?` + params.toString())
                 .then(response => {
                     if (response.ok) {
-                        // Redirect to the React app on port 3000
-                        window.location.href = 'http://localhost:3000/?auth=success';
+                        // Redirect to the React app
+                        window.location.href = `${frontendBase}/?auth=success`;
                     } else {
-                        window.location.href = 'http://localhost:3000/?auth=error';
+                        window.location.href = `${frontendBase}/?auth=error`;
                     }
                 })
                 .catch(() => {
-                    window.location.href = 'http://localhost:3000/?auth=error';
+                    window.location.href = `${frontendBase}/?auth=error`;
                 });
         } else {
             // No code or error, redirect to home
-            window.location.href = 'http://localhost:3000/';
+            window.location.href = `${frontendBase}/`;
         }
     </script>
 </body>

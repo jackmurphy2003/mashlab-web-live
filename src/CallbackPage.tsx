@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { apiUrl } from './lib/apiClient';
 
 export default function CallbackPage() {
   useEffect(() => {
@@ -18,7 +19,7 @@ export default function CallbackPage() {
         params.append('state', urlParams.get('state')!);
       }
       
-      fetch('http://localhost:3001/api/auth/spotify/callback?' + params.toString())
+      fetch(apiUrl('/api/auth/spotify/callback?' + params.toString()))
         .then(response => {
           if (response.ok) {
             // Redirect to the React app

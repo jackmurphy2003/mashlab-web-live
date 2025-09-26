@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { apiFetch } from '../../lib/apiClient';
 
 interface BPMKeyFixerProps {
   spotifyId: string;
@@ -24,7 +25,7 @@ export const BPMKeyFixer: React.FC<BPMKeyFixerProps> = ({
 
   const handleSave = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/qc/override', {
+      const response = await apiFetch('/api/qc/override', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -47,7 +48,7 @@ export const BPMKeyFixer: React.FC<BPMKeyFixerProps> = ({
 
   const handleClear = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/qc/override', {
+      const response = await apiFetch('/api/qc/override', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ spotifyId })

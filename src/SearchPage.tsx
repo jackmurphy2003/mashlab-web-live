@@ -1,5 +1,6 @@
 import React from "react";
 import { useLibraryStore, TrackRow } from "./store/library";
+import { apiFetch } from "./lib/apiClient";
 
 
 const colors = {
@@ -115,8 +116,8 @@ export default function SearchPage() {
       console.log('📡 Fetching tracks from API...');
       
       // Get initial search results
-      const apiUrl = `http://localhost:3001/api/deezer/search?q=${encodeURIComponent(q.trim())}&limit=25`;
-      const res = await fetch(apiUrl);
+      const searchUrl = `/api/deezer/search?q=${encodeURIComponent(q.trim())}&limit=25`;
+      const res = await apiFetch(searchUrl);
       if (!res.ok) throw new Error(`Deezer search failed: ${res.status}`);
       const data = await res.json();
       
@@ -159,7 +160,7 @@ export default function SearchPage() {
           // 1) Try track details first (sometimes includes bpm)
           if (!row.audio?.bpm && row.id) {
             try {
-              const r1 = await fetch(`http://localhost:3001/api/deezer/track/${row.id}`);
+              const r1 = await apiFetch(`/api/deezer/track/${row.id}`);
               if (r1.ok) {
                 const full = await r1.json();
                 if (full?.audio?.bpm) {
@@ -181,7 +182,7 @@ export default function SearchPage() {
           // 2) Fallback: enrichment pipeline
           if (!row.audio?.bpm && row.id) {
             try {
-              const r2 = await fetch(`http://localhost:3001/api/meta/enrich/${row.id}`);
+              const r2 = await apiFetch(`/api/meta/enrich/${row.id}`);
               if (r2.ok) {
                 const meta = await r2.json();
                 if (meta?.bpm || meta?.key) {
@@ -201,7 +202,7 @@ export default function SearchPage() {
           // 3) Genre enrichment (always try to get genres)
           if (row.id && (!row.genres || row.genres.length === 0)) {
             try {
-              const r3 = await fetch(`http://localhost:3001/api/meta/genre/${row.id}`);
+              const r3 = await apiFetch(`/api/meta/genre/${row.id}`);
               if (r3.ok) {
                 const genreData = await r3.json();
                 if (genreData?.genres && genreData.genres.length > 0) {

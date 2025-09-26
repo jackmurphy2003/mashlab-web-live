@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiFetch, apiUrl } from '../lib/apiClient';
 
 interface SpotifyAuthProps {
   onAuthChange?: (authenticated: boolean) => void;
@@ -14,7 +15,7 @@ export default function SpotifyAuth({ onAuthChange }: SpotifyAuthProps) {
 
   const checkAuthStatus = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/auth/spotify/status');
+      const response = await apiFetch('/api/auth/spotify/status');
       const data = await response.json();
       setIsAuthenticated(data.authenticated);
       onAuthChange?.(data.authenticated);
@@ -30,7 +31,7 @@ export default function SpotifyAuth({ onAuthChange }: SpotifyAuthProps) {
   const handleLogin = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('http://localhost:3001/api/auth/spotify/login');
+      const response = await apiFetch('/api/auth/spotify/login');
       const data = await response.json();
       
       // Redirect to Spotify authorization page
@@ -44,7 +45,7 @@ export default function SpotifyAuth({ onAuthChange }: SpotifyAuthProps) {
   const handleLogout = async () => {
     try {
       setIsLoading(true);
-      await fetch('http://localhost:3001/api/auth/spotify/logout');
+      await apiFetch('/api/auth/spotify/logout');
       setIsAuthenticated(false);
       onAuthChange?.(false);
     } catch (error) {
@@ -83,7 +84,7 @@ export default function SpotifyAuth({ onAuthChange }: SpotifyAuthProps) {
 
   const storeToken = async (accessToken: string, refreshToken: string, expiresIn: string) => {
     try {
-      const response = await fetch('http://localhost:3001/api/auth/spotify/store-token', {
+      const response = await apiFetch('/api/auth/spotify/store-token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

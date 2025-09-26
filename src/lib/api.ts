@@ -1,4 +1,5 @@
 import { TrackRow, Criteria, Mashup } from '../store/mashups';
+import { apiFetch } from './apiClient';
 
 export async function searchMashups(params: {
   seedId: string;
@@ -17,7 +18,7 @@ export async function searchMashups(params: {
     ...(params.source === "library" && params.libraryTracks ? { libraryTracks: params.libraryTracks } : {})
   };
 
-  const response = await fetch('http://localhost:3001/api/mashups/search', {
+  const response = await apiFetch('/api/mashups/search', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(requestBody)

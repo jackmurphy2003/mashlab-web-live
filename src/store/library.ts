@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { apiFetch } from "../lib/apiClient";
 
 export type TrackRow = {
   // Core identifiers
@@ -109,7 +110,7 @@ export const useLibraryStore = create<State>()(
         
         // Also update on the server
         try {
-          await fetch('http://localhost:3001/api/library/update-track', {
+          await apiFetch('/api/library/update-track', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(track)
@@ -179,7 +180,7 @@ export const useLibraryStore = create<State>()(
 
       syncWithServer: async () => {
         try {
-          const response = await fetch('http://localhost:3001/api/library/sync');
+          const response = await apiFetch('/api/library/sync');
           if (response.ok) {
             const serverTracks = await response.json();
             const currentLibrary = get().libraryById;

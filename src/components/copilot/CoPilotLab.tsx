@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useCopilotLab } from '../../state/copilotLab';
 import { getCopilotConfig, getSeeds, getRecommendations, saveMashupSession, exportCSV } from '../../lib/spotifyCoPilot';
+import { apiFetch } from '../../lib/apiClient';
 
 const colors = {
   bg: "#0c1020",
@@ -77,7 +78,7 @@ export default function CoPilotLab() {
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/auth/spotify/status');
+        const response = await apiFetch('/api/auth/spotify/status');
         const data = await response.json();
         setAuth({ accessToken: data.authenticated ? 'authenticated' : null });
       } catch (error) {
@@ -288,7 +289,7 @@ export default function CoPilotLab() {
           <button
             onClick={async () => {
               try {
-                const response = await fetch('http://localhost:3001/api/auth/spotify/login');
+                const response = await apiFetch('/api/auth/spotify/login');
                 const data = await response.json();
                 window.location.href = data.authUrl;
               } catch (error) {

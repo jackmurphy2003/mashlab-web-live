@@ -1,11 +1,12 @@
 import React from 'react';
 import { useLibraryStore } from '../../store/library';
 import { useMashups, TrackRow } from '../../store/mashups';
+import { apiFetch } from '../../lib/apiClient';
 
 // Add Spotify search functionality
 async function searchSpotify(query: string): Promise<any[]> {
   try {
-    const response = await fetch(`http://localhost:3001/api/spotify/search?q=${encodeURIComponent(query)}&type=track&limit=10`);
+    const response = await apiFetch(`/api/spotify/search?q=${encodeURIComponent(query)}&type=track&limit=10`);
     if (!response.ok) throw new Error('Search failed');
     const data = await response.json();
     return data.tracks?.items || [];

@@ -29,8 +29,8 @@ pkill -f "node server.js" 2>/dev/null || true
 pkill -f "npm start" 2>/dev/null || true
 
 # Start the backend server
-echo "🚀 Starting Spotify API server on port 3001..."
-node server.js &
+echo "🚀 Starting Spotify API server on port ${NEXT_PUBLIC_API_URL:-http://localhost:3001}..."
+NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:3001} node server.js &
 SERVER_PID=$!
 
 # Wait a moment for the server to start
@@ -41,9 +41,9 @@ echo "🌐 Starting React development server on port 3000..."
 # Use a different port if 3000 is busy
 if lsof -Pi :3000 -sTCP:LISTEN -t >/dev/null ; then
     echo "⚠️  Port 3000 is busy, using port 3002..."
-    PORT=3002 npm run dev &
+    PORT=3002 NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:3001} npm run dev &
 else
-    npm run dev &
+    NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:3001} npm run dev &
 fi
 FRONTEND_PID=$!
 

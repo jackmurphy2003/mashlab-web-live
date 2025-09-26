@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { apiFetch } from '../lib/apiClient';
 
 export type TrackRow = {
   // Core identifiers
@@ -227,7 +228,7 @@ export const useMashups = create<MashupsState>()(
             ...((source === 'library' || source === 'collections') && libraryTracks ? { libraryTracks } : {})
           };
           
-          const response = await fetch('http://localhost:3001/api/mashups/search', {
+          const response = await apiFetch('/api/mashups/search', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(requestBody)
@@ -277,7 +278,7 @@ export const useMashups = create<MashupsState>()(
         }
 
         try {
-          const response = await fetch('http://localhost:3001/api/mashups/save', {
+          const response = await apiFetch('/api/mashups/save', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

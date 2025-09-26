@@ -14,9 +14,11 @@ export default function App({ Component, pageProps }: AppProps) {
 
   // Initialize from localStorage on mount
   React.useEffect(() => {
-    const saved = localStorage.getItem('mashlab-current-page');
-    if (saved) {
-      setCurrentPage(saved);
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('mashlab-current-page');
+      if (saved) {
+        setCurrentPage(saved);
+      }
     }
   }, []);
 
@@ -24,7 +26,9 @@ export default function App({ Component, pageProps }: AppProps) {
   const changePage = (page: string) => {
     console.log('🎯 DIRECT PAGE CHANGE:', page);
     setCurrentPage(page);
-    localStorage.setItem('mashlab-current-page', page);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('mashlab-current-page', page);
+    }
   };
 
   // Handle URL routing - only on client side
@@ -47,7 +51,7 @@ export default function App({ Component, pageProps }: AppProps) {
         changePage('search');
       }
     }
-  }, []);
+  }, [changePage]);
 
   // Render content based on current page
   const renderPage = () => {
