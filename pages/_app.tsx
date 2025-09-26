@@ -22,34 +22,31 @@ export default function App({ Component, pageProps }: AppProps) {
     }
   }, []);
 
-  // Direct tab change function - NO useCallback, NO refs, NO complexity
-  const changePage = (page: string) => {
+  // Direct tab change function
+  const changePage = React.useCallback((page: string) => {
     console.log('🎯 DIRECT PAGE CHANGE:', page);
     setCurrentPage(page);
     if (typeof window !== 'undefined') {
       localStorage.setItem('mashlab-current-page', page);
     }
-  };
+  }, []);
 
   // Handle URL routing - only on client side
   React.useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const path = window.location.pathname;
-      if (path === '/callback') {
-        // Don't change page for callback
-        return;
-      }
-      if (path === '/recommender') {
-        changePage('mashups');
-      } else if (path === '/copilot') {
-        changePage('copilot');
-      } else if (path === '/library') {
-        changePage('library');
-      } else if (path === '/mashups') {
-        changePage('mashups');
-      } else {
-        changePage('search');
-      }
+    if (typeof window === 'undefined') return;
+    const path = window.location.pathname;
+    if (path === '/callback') {
+      // Don't change page for callback
+      return;
+    }
+    if (path === '/recommender' || path === '/mashups') {
+      changePage('mashups');
+    } else if (path === '/copilot') {
+      changePage('copilot');
+    } else if (path === '/library') {
+      changePage('library');
+    } else {
+      changePage('search');
     }
   }, [changePage]);
 
