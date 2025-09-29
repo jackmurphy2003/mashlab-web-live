@@ -1,6 +1,6 @@
 import React from "react";
 
-function BrandLockup({ onTabChange }: { onTabChange: (tab: "search" | "library" | "mashups" | "copilot") => void }) {
+function BrandLockup({ onTabChange }: { onTabChange: (tab: "search" | "library" | "mashups") => void }) {
   return (
     <div
       onClick={() => onTabChange("search")}
@@ -27,8 +27,8 @@ function BrandLockup({ onTabChange }: { onTabChange: (tab: "search" | "library" 
 }
 
 type NavigationProps = {
-  activeTab: "search" | "library" | "mashups" | "copilot";
-  onTabChange: (tab: "search" | "library" | "mashups" | "copilot") => void;
+  activeTab: "search" | "library" | "mashups";
+  onTabChange: (tab: "search" | "library" | "mashups") => void;
 };
 
 export default function Navigation({ activeTab, onTabChange }: NavigationProps) {
@@ -36,7 +36,6 @@ export default function Navigation({ activeTab, onTabChange }: NavigationProps) 
     { href: "/search", label: "Search" },
     { href: "/library", label: "Library" },
     { href: "/mashups", label: "Mashups" },
-    { href: "/copilot", label: "Co-Pilot (Lab Mode)" },
   ];
   
   return (
@@ -45,7 +44,7 @@ export default function Navigation({ activeTab, onTabChange }: NavigationProps) 
       
       <nav className="flex items-center gap-8 ml-16">
         {nav.map((n) => {
-          const tabKey = n.label.toLowerCase().replace(' (lab mode)', '') as "search" | "library" | "mashups" | "copilot";
+          const tabKey = n.label.toLowerCase() as "search" | "library" | "mashups";
           const active = activeTab === tabKey;
           return (
             <button

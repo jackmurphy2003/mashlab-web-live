@@ -49,63 +49,9 @@ function ToggleRow({ label, checked, onChange, children }: ToggleRowProps) {
   );
 }
 
-interface RangeProps {
-  min: number;
-  max: number;
-  step: number;
-  value: [number, number];
-  disabled?: boolean;
-  onChange: (value: [number, number]) => void;
-}
-
-function Range({ min, max, step, value, disabled, onChange }: RangeProps) {
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center gap-2">
-        <input
-          type="range"
-          min={min}
-          max={max}
-          step={step}
-          value={value[0]}
-          disabled={disabled}
-          onChange={(e) => onChange([parseFloat(e.target.value), value[1]])}
-          className="flex-1 h-2 rounded-lg appearance-none cursor-pointer"
-          style={{ 
-            background: disabled ? colors.muted2 : colors.pillBg,
-            opacity: disabled ? 0.5 : 1
-          }}
-        />
-        <span className="text-xs w-8 text-right" style={{ color: colors.muted }}>
-          {value[0]}
-        </span>
-      </div>
-      <div className="flex items-center gap-2">
-        <input
-          type="range"
-          min={min}
-          max={max}
-          step={step}
-          value={value[1]}
-          disabled={disabled}
-          onChange={(e) => onChange([value[0], parseFloat(e.target.value)])}
-          className="flex-1 h-2 rounded-lg appearance-none cursor-pointer"
-          style={{ 
-            background: disabled ? colors.muted2 : colors.pillBg,
-            opacity: disabled ? 0.5 : 1
-          }}
-        />
-        <span className="text-xs w-8 text-right" style={{ color: colors.muted }}>
-          {value[1]}
-        </span>
-      </div>
-    </div>
-  );
-}
 
 export default function FilterRail() {
   const { criteria, setCriteria, source } = useMashups();
-  const [showMoreFilters, setShowMoreFilters] = React.useState(false);
 
   return (
     <div className="rounded-2xl border px-4 md:px-5 py-4 sticky top-6 h-fit" style={{ background: colors.bgPanel, borderColor: colors.border }}>
@@ -141,7 +87,7 @@ export default function FilterRail() {
       {/* Divider */}
       <div className="h-px mb-3" style={{ background: colors.divider }} />
 
-      {/* Key Toggle */}
+      {/* Same Key Toggle */}
       <div className="space-y-2 mb-4">
         <div className="flex items-center gap-2">
           <input
@@ -152,13 +98,13 @@ export default function FilterRail() {
             style={{ borderColor: colors.pillBorder }}
           />
           <label className="text-sm font-medium" style={{ color: colors.text }}>
-            Key
+            Same key
           </label>
         </div>
         {criteria.keyOn && (
           <div className="ml-6">
             <div className="text-sm" style={{ color: colors.muted }}>
-              Same key as seed
+              Match the key of the seed track
             </div>
           </div>
         )}
@@ -225,53 +171,16 @@ export default function FilterRail() {
         <div className="flex items-center gap-2">
           <input
             type="checkbox"
-            checked={criteria.explicitFree}
-            onChange={(e) => setCriteria({ explicitFree: e.target.checked })}
-            className="w-4 h-4 rounded border-2"
-            style={{ borderColor: colors.pillBorder }}
+            disabled={true}
+            className="w-4 h-4 rounded border-2 opacity-50"
+            style={{ borderColor: colors.muted2 }}
           />
-          <label className="text-sm font-medium" style={{ color: colors.text }}>
-            Explicit-free
+          <label className="text-sm font-medium" style={{ color: colors.muted }}>
+            Explicit - Coming Soon!
           </label>
         </div>
       </div>
 
-      {/* Show More Divider */}
-      <div className="h-px mb-3" style={{ background: colors.divider }} />
-
-      {/* Show More Button */}
-      <button
-        onClick={() => setShowMoreFilters(!showMoreFilters)}
-        className="w-full h-8 px-3 rounded-full border text-sm font-medium transition-colors"
-        style={{ 
-          background: 'transparent', 
-          color: colors.text, 
-          borderColor: colors.pillBorder 
-        }}
-      >
-        Show more
-      </button>
-
-      {/* More Filters */}
-      {showMoreFilters && (
-        <div className="mt-4 space-y-4">
-          {/* Year Range */}
-          <ToggleRow
-            label="Year range"
-            checked={criteria.yearOn ?? false}
-            onChange={(checked) => setCriteria({ yearOn: checked })}
-          >
-            <Range
-              min={1950}
-              max={2030}
-              step={1}
-              value={criteria.year || [2000, 2030]}
-              disabled={!criteria.yearOn}
-              onChange={(value) => setCriteria({ year: value })}
-            />
-          </ToggleRow>
-        </div>
-      )}
     </div>
   );
 }

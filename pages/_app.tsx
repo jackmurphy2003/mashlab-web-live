@@ -4,7 +4,6 @@ import Navigation from "../src/components/Navigation";
 import SearchPage from "../src/SearchPage";
 import LibraryPage from "../src/LibraryPage";
 import MashupsPage from "../src/MashupsPage";
-import CopilotPage from "../src/CopilotPage";
 import CallbackPage from "../src/CallbackPage";
 import "../src/index.css";
 
@@ -41,8 +40,6 @@ export default function App({ Component, pageProps }: AppProps) {
     }
     if (path === '/recommender' || path === '/mashups') {
       changePage('mashups');
-    } else if (path === '/copilot') {
-      changePage('copilot');
     } else if (path === '/library') {
       changePage('library');
     } else {
@@ -58,20 +55,6 @@ export default function App({ Component, pageProps }: AppProps) {
         return <LibraryPage />;
       case 'mashups':
         return <MashupsPage />;
-      case 'copilot':
-        return (
-          <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
-            <div className="mb-6">
-              <div className="text-6xl mb-4">🤖</div>
-              <h1 className="text-3xl font-bold text-white mb-2">Co-Pilot (Lab Mode)</h1>
-              <p className="text-xl text-gray-300">Coming Soon</p>
-            </div>
-            <div className="text-gray-400 max-w-md">
-              <p>Advanced AI-powered music analysis and recommendations are in development.</p>
-              <p className="mt-2">Stay tuned for the next generation of music discovery!</p>
-            </div>
-          </div>
-        );
       case 'search':
       default:
         return <SearchPage />;
@@ -87,10 +70,10 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <div className="min-h-screen" style={{ background: "#0C1022" }}>
-      <div className="mx-auto max-w-[1280px] px-6 py-8">
+      <div className="mx-auto max-w-[1280px] px-6 py-6">
         <div className="mb-8">
           <Navigation 
-            activeTab={currentPage as "search" | "library" | "mashups" | "copilot"} 
+            activeTab={currentPage as "search" | "library" | "mashups"} 
             onTabChange={changePage} 
           />
         </div>

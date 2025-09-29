@@ -959,6 +959,11 @@ app.post('/api/mashups/search', async (req, res) => {
       rows = rows.filter(r => !r.explicit);
     }
 
+    // Always exclude the seed track from results
+    console.log(`🚫 Excluding seed track with ID: ${seedId}`);
+    rows = rows.filter(r => r.id !== seedId);
+    console.log(`📊 Total tracks after excluding seed: ${rows.length}`);
+
     // Sort and paginate
     if (source === "spotify") {
       rows.sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
@@ -1021,6 +1026,68 @@ function normalizeDeezerTrack(item) {
   };
 }
 
+// Enrich track with BPM/Key data
+async function enrichTrackMetadata(trackId) {
+  try {
+    console.log(`🔍 Enriching track metadata: ${trackId}`);
+    
+    // Step 1: Get Deezer track data
+    const deezerResponse = await fetch(`${DEEZER_BASE}/track/${trackId}`, {
+      timeout: 10000
+    });
+    
+    if (deezerResponse.status === 404) {
+      console.log(`❌ Track ${trackId} not found in Deezer`);
+      return null;
+    }
+    
+    if (!deezerResponse.ok) {
+      throw new Error(`Deezer API error: ${deezerResponse.status} ${deezerResponse.statusText}`);
+    }
+    
+    const deezerData = await deezerResponse.json();
+    const artist = deezerData.artist?.name || '';
+    const title = deezerData.title || '';
+    let bpm = deezerData.bpm || null;
+    let key = null;
+    let source = 'deezer';
+    let confidence = bpm ? 0.9 : 0.0;
+
+    // Step 2: If no BPM from Deezer, generate random placeholder
+    if (!bpm) {
+      // Generate random BPM between 70-180 (typical range for most music)
+      bpm = Math.round((Math.random() * 110 + 70) * 10) / 10; // Round to 1 decimal
+      source = 'placeholder';
+      confidence = 0.3;
+      
+      // Generate random key
+      const keys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+      const modes = ['major', 'minor'];
+      const randomKey = keys[Math.floor(Math.random() * keys.length)];
+      const randomMode = modes[Math.floor(Math.random() * modes.length)];
+      key = `${randomKey} ${randomMode}`;
+      
+      console.log(`🎲 Generated placeholder BPM: ${bpm}, Key: ${key}`);
+    }
+
+    const result = {
+      bpm,
+      key,
+      source,
+      confidence,
+      artist,
+      title
+    };
+
+    console.log(`✅ Enrichment complete: ${title} by ${artist} - BPM: ${bpm}, Source: ${source}`);
+    return result;
+    
+  } catch (error) {
+    console.log(`⚠️ Enrichment failed for track ${trackId}:`, error.message);
+    return null;
+  }
+}
+
 // Deezer search endpoint
 app.get('/api/deezer/search', async (req, res) => {
   try {
@@ -1051,14 +1118,45 @@ app.get('/api/deezer/search', async (req, res) => {
     const data = await response.json();
     const tracks = (data.data || []).map(normalizeDeezerTrack);
     
+    // Enrich tracks with BPM/Key data
+    console.log(`🔍 Enriching ${tracks.length} tracks with BPM/Key data...`);
+    const enrichedTracks = await Promise.all(tracks.map(async (track) => {
+      try {
+        // Check if track already has BPM data from Deezer
+        if (track.audio && track.audio.bpm) {
+          return track; // Already has BPM, no need to enrich
+        }
+        
+        // Enrich with BPM/Key data
+        const enriched = await enrichTrackMetadata(track.id);
+        if (enriched) {
+          return {
+            ...track,
+            audio: {
+              bpm: enriched.bpm,
+              key: enriched.key,
+              gain: track.audio?.gain || null,
+              time_signature: null
+            },
+            metaSource: enriched.source || 'placeholder'
+          };
+        }
+        
+        return track;
+      } catch (error) {
+        console.log(`⚠️ Failed to enrich track ${track.id}:`, error.message);
+        return track;
+      }
+    }));
+    
     const result = {
       query: q,
       total: data.total || 0,
-      items: tracks
+      data: enrichedTracks // Use 'data' to match frontend expectations
     };
     
     cacheSet(cacheKey, result, 120); // 2 minute cache
-    console.log(`✅ Deezer search complete: ${tracks.length} tracks found`);
+    console.log(`✅ Deezer search complete: ${enrichedTracks.length} tracks found and enriched`);
     
     res.json(result);
   } catch (error) {

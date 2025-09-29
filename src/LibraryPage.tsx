@@ -611,7 +611,7 @@ function CollectionsGrid({ className = "" }: { className?: string }) {
 
 export default function LibraryPage() {
   return (
-    <div className="mx-auto max-w-[1440px] px-6 py-6">
+    <div className="w-full">
       {/* 1) Library card (table) */}
       <LibraryTable />
 

@@ -31,7 +31,7 @@ export default function MashupsPage() {
   }, [syncWithServer]);
 
   return (
-    <div className="mx-auto max-w-[1440px] px-6 py-6 flex flex-col gap-6">
+    <div className="w-full flex flex-col gap-6">
       {/* Internal Tabs */}
       <div className="flex items-center gap-1 p-1 rounded-lg h-11" style={{ background: colors.border }}>
         <button
@@ -82,7 +82,7 @@ function BuildTab({ onTabChange }: { onTabChange: (tab: 'build' | 'saved') => vo
 
       {/* Two-Pane Body */}
       {seed && (
-        <div className="grid grid-cols-1 lg:grid-cols-[304px_minmax(0,1fr)] gap-6 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[300px_minmax(0,1fr)] gap-6 items-start">
           {/* Left Filter Rail */}
           <FilterRail />
           
