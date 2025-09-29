@@ -8,7 +8,19 @@ const { getDb } = require('./lib/db.js');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors());
+// Configure CORS to allow requests from Vercel
+app.use(cors({
+  origin: [
+    'https://mashlab-web-public.vercel.app',
+    'https://mashlab-web-public.vercel.app/',
+    'http://localhost:3000',
+    'http://localhost:3001'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
+
 app.use(express.json());
 
 let cachedToken = null;
