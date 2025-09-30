@@ -8,14 +8,37 @@ const { getDb } = require('./lib/db.js');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Configure CORS to allow requests from Vercel
+// Configure CORS to allow requests from Vercel (and local dev)
+const defaultAllowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'https://mashlab-web-public.vercel.app',
+  'https://mashlab-web-public.vercel.app/',
+  'https://mashlab-web-live.vercel.app',
+  'https://mashlab-web-live.vercel.app/'
+];
+
+const environmentAllowedOrigins = (process.env.CORS_ALLOWED_ORIGINS || '')
+  .split(',')
+  .map(origin => origin.trim())
+  .filter(Boolean);
+
+const allowedOrigins = [...new Set([...defaultAllowedOrigins, ...environmentAllowedOrigins])];
+
 app.use(cors({
-  origin: [
-    'https://mashlab-web-public.vercel.app',
-    'https://mashlab-web-public.vercel.app/',
-    'http://localhost:3000',
-    'http://localhost:3001'
-  ],
+  origin: (origin, callback) => {
+    if (!origin) {
+      // Allow non-browser clients (like curl) with no origin header
+      return callback(null, true);
+    }
+
+    if (allowedOrigins.includes(origin) || /https:\/\/.*\.vercel\.app$/.test(origin)) {
+      return callback(null, true);
+    }
+
+    console.warn(`❌ Blocked CORS origin: ${origin}`);
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
