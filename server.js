@@ -46,6 +46,15 @@ app.use(cors({
 
 app.use(express.json());
 
+// Ensure Access-Control-Allow-Origin is echoed in responses
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && (allowedOrigins.includes(origin) || /https:\/\/.*\.vercel\.app$/.test(origin))) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  next();
+});
+
 let cachedToken = null;
 let userTokens = new Map(); // Store user tokens
 
